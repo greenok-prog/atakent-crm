@@ -1,0 +1,44 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Директории сборки
+.nuxt/
+dist/
+build/
+coverage/
+out/
+
+# Лог файлы
+*.log
+
+# Прочие временные файлы
+*.swp
+*.swo
+*.DS_Store
+
+# Прочее
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Файлы, генерируемые в процессе разработки
+# Nuxt
+npm run generate
+
+# NestJS
+*.js
+*.map
+*.d.ts
+
+# Базы данных
+*.sqlite
+*.db

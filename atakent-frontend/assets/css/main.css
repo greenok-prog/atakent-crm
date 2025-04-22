@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* .p-datatable, .p-datatable-wrapper, .p-datatable-tbody, .p-datatable-table, .p-datatable-scrollable, .p-datatable-header, .p-datatable-header-cell, .p-datatable-thead, .p-datatable-empty-message, .p-row-even{
+    background-color: transparent !important;
+} */
+.p-paginator-page-selected{
+    background: #4338ca  !important;
+}
+.p-select-clear-icon{
+    margin-right: 6px;
+}
+
