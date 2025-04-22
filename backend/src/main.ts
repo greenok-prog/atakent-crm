@@ -15,6 +15,7 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.useLogger(new Logger());
   app.use(urlencoded({ extended: true, limit: '50mb' }));
+  app.setGlobalPrefix('backend-api');
   const config = new DocumentBuilder()
     .setTitle('Notes API')
     .setDescription('The notes API description')
