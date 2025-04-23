@@ -14,7 +14,7 @@ export class ExhibitionsController {
   @Post()
   @UseInterceptors(FileInterceptor('image', {
     storage:diskStorage({
-      destination:'public/exhibitions',
+      destination:'app/public/exhibitions',
       filename: (req, file, cb) => {
         cb(null, `${file.originalname}`);
       },

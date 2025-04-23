@@ -42,7 +42,6 @@ import { MailerModule } from './mailer/mailer.module';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [Exhibitor, Exhibition, Employee, Visitor, User, Source, Organizer],
-    synchronize:true  
     
   }), 
   
@@ -51,6 +50,7 @@ import { MailerModule } from './mailer/mailer.module';
     rootPath: join(__dirname, '..', 'public'),  // Путь до public папки
     serveRoot: '/public',  // Путь, по которому будут доступны статичные файлы
   }),
+  
   EmployeesModule,
   VisitorsModule,
   UsersModule,
