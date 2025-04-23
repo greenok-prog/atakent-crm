@@ -3,45 +3,63 @@
         <div class="container mx-auto px-4">
             <h2 class="text-xl font-bold text-gray-900 mb-6">Настройки</h2>
 
-            <!-- Организаторы выставок -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4">Организаторы выставок</h2>
-                <div class="flex mb-4">
-                    <BaseInput v-model="organizer" placeholder="Введите имя организатора" class="flex-grow mr-2" />
-                    <Button @click="addOrganizer(organizer)" label="Добавить" icon="pi pi-plus" />
-                </div>
-                <DataTable :value="organizers" class="p-datatable-sm">
-                    <Column field="name" header="Имя организатора"></Column>
-                    <Column header="Действия" style="width: 100px">
-                        <template #body="slotProps">
+            <div class="grid grid-cols-2 gap-4 items-start">
+                <!-- Организаторы выставок -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Организаторы выставок</h2>
+                    <div class="flex mb-4">
+                        <BaseInput v-model="organizer" placeholder="Введите имя организатора" class="flex-grow mr-2" />
+                        <Button @click="addOrganizer(organizer)" label="Добавить" icon="pi pi-plus" />
+                    </div>
+                    <DataTable :value="organizers" class="p-datatable-sm">
+                        <Column field="name" header="Имя организатора"></Column>
+                        <Column header="Действия" style="width: 100px">
+                            <template #body="slotProps">
 
-                            <Button icon="pi pi-pencil" class="p-button-text p-button-sm"
-                                @click="editOrganizer(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger"
-                                @click="deleteOrganizer(slotProps.data.id)" />
-                        </template>
-                    </Column>
-                </DataTable>
-            </div>
-
-            <!-- Источники информации -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4">Источники информации</h2>
-                <div class="flex mb-4">
-                    <BaseInput v-model="source" placeholder="Введите источник информации" class="flex-grow mr-2" />
-                    <Button @click="addSourceHandler" label="Добавить" icon="pi pi-plus" />
+                                <Button icon="pi pi-pencil" class="p-button-text p-button-sm"
+                                    @click="editOrganizer(slotProps.data)" />
+                                <Button icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger"
+                                    @click="deleteOrganizer(slotProps.data.id)" />
+                            </template>
+                        </Column>
+                    </DataTable>
                 </div>
-                <DataTable :value="sources" class="p-datatable-sm">
-                    <Column field="name" header="Источник информации"></Column>
-                    <Column header="Действия" style="width: 100px">
-                        <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-text p-button-sm"
-                                @click="editSource(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger"
-                                @click="removeSourceHandler(slotProps.data.id)" />
-                        </template>
-                    </Column>
-                </DataTable>
+
+                <!-- Источники информации -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Источники информации</h2>
+                    <div class="flex mb-4">
+                        <BaseInput v-model="source" placeholder="Введите источник информации" class="flex-grow mr-2" />
+                        <Button @click="addSourceHandler" label="Добавить" icon="pi pi-plus" />
+                    </div>
+                    <DataTable :value="sources" class="p-datatable-sm">
+                        <Column field="name" header="Источник информации"></Column>
+                        <Column header="Действия" style="width: 100px">
+                            <template #body="slotProps">
+                                <Button icon="pi pi-pencil" class="p-button-text p-button-sm"
+                                    @click="editSource(slotProps.data)" />
+                                <Button icon="pi pi-trash" class="p-button-text p-button-sm p-button-danger"
+                                    @click="removeSourceHandler(slotProps.data.id)" />
+                            </template>
+                        </Column>
+                    </DataTable>
+                </div>
+
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold mb-4">Создание ссылки</h2>
+                    <div class="grid grid-cols-5 gap-4">
+                        <Select class="col-span-2" />
+                        <Select class="col-span-2" />
+                        <Button label="Создать" />
+                    </div>
+                    <div class="grid grid-cols-5 mt-4 gap-4">
+                        <div class="col-span-4 border h-10 rounded">
+                            <p></p>
+                        </div>
+                        <Button icon="pi pi-copy" raised severity="secondary" aria-label="Save" />
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -389,6 +389,7 @@
 
             // Проверяем UUID
             await verifyVisitor(uuid)
+            await markAsScanned()
         } catch (error) {
 
             scanResult.value = {
