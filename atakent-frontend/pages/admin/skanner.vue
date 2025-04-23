@@ -296,7 +296,7 @@
         console.log("selectedDeviceId:", selectedDeviceId.value)
         console.log("videoElement:", videoElement.value)
 
-        if (!codeReader || !videoElement.value || !hasCamera.value || !selectedDeviceId.value) {
+        if (!codeReader || !videoElement.value || !hasCamera.value) {
             console.warn("⛔ Сканер не может быть запущен. Проверь параметры выше.")
             return
         }
