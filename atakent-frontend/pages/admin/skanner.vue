@@ -8,25 +8,29 @@
                 <div class="flex flex-col items-center mb-6">
                     <div ref="scannerContainer"
                         class="w-full max-w-md h-80 bg-gray-100 rounded-lg overflow-hidden relative mb-4">
-                        <div v-if="!isScanning" class="absolute inset-0 flex items-center justify-center">
+
+                        <!-- Видео слой -->
+                        <video v-show="isScanning" ref="videoElement"
+                            class="w-full h-full object-cover z-0 absolute top-0 left-0"></video>
+
+                        <!-- Кнопка запуска -->
+                        <div v-if="!isScanning"
+                            class="absolute inset-0 flex items-center justify-center z-10 bg-white bg-opacity-80">
                             <Button @click="startScanner" icon="pi pi-camera" label="Начать сканирование"
                                 class="p-button-lg" />
                         </div>
-                        <video v-show="isScanning" ref="videoElement" class="w-full h-full object-cover"></video>
+
+                        <!-- Анимация рамки сканирования -->
                         <div v-if="isScanning"
-                            class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <!-- Улучшенная область сканирования с анимацией -->
+                            class="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
                             <div class="w-3/4 h-3/4 border-2 border-blue-500 relative">
-                                <!-- Угловые маркеры -->
+                                <!-- Углы рамки -->
                                 <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-blue-500"></div>
                                 <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-blue-500"></div>
                                 <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-blue-500">
                                 </div>
                                 <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-blue-500">
                                 </div>
-
-                                <!-- Сканирующая линия -->
-
                             </div>
                         </div>
                     </div>
@@ -173,7 +177,25 @@
     const currentToken = ref<string | null>(null)
     const debugInfo = ref<string | null>(null)
     const mobileUrl = ref("")
+    const selectedDeviceId = ref<string | null>(null)
+    const videoDevices = ref<MediaDeviceInfo[]>([])
 
+    function selectFrontCamera() {
+        const frontCam = videoDevices.value.find((device) =>
+            /front|user/i.test(device.label)
+        )
+        if (frontCam) {
+            selectedDeviceId.value = frontCam.deviceId
+            startScanner()
+        } else {
+            toast.add({
+                severity: "warn",
+                summary: "Камера",
+                detail: "Фронтальная камера не найдена",
+                life: 3000,
+            })
+        }
+    }
     // QR-сканер
     let codeReader: BrowserMultiFormatReader | null = null
 
@@ -225,22 +247,27 @@
 
     async function initScanner() {
         try {
-            // Проверяем доступность камеры
             const devices = await navigator.mediaDevices.enumerateDevices()
-            const videoDevices = devices.filter((device) => device.kind === "videoinput")
-            hasCamera.value = videoDevices.length > 0
+            videoDevices.value = devices.filter((device) => device.kind === "videoinput")
+
+            hasCamera.value = videoDevices.value.length > 0
 
             if (!hasCamera.value) {
                 toast.add({
                     severity: "warn",
-                    summary: "Внимание",
-                    detail: "Камера не найдена. Используйте мобильное устройство.",
+                    summary: "Камера не найдена",
+                    detail: "Используйте мобильное устройство",
                     life: 5000,
                 })
                 return
             }
 
-            // Настраиваем сканер с улучшенными параметрами
+            // Выбор фронтальной камеры
+            const frontCamera = videoDevices.value.find((device) =>
+                /front|user/i.test(device.label)
+            )
+            selectedDeviceId.value = frontCamera?.deviceId || videoDevices.value[0]?.deviceId
+
             const hints = new Map()
             hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE])
             hints.set(DecodeHintType.TRY_HARDER, true)
@@ -253,29 +280,29 @@
         }
     }
 
+
     function checkCameraAgain() {
         hasCamera.value = false // Сбрасываем состояние
         initScanner() // Проверяем камеру снова
     }
 
     async function startScanner() {
-        if (!codeReader || !videoElement.value || !hasCamera.value) return
+        if (!codeReader || !videoElement.value || !hasCamera.value || !selectedDeviceId.value) return
 
         try {
             isScanning.value = true
             scanResult.value = null
             debugInfo.value = null
 
-            // Запускаем сканирование с улучшенными настройками
             await codeReader.decodeFromVideoDevice(
-                null, // Используем камеру по умолчанию
+                selectedDeviceId.value,
                 videoElement.value,
                 (result, error) => {
                     if (result) {
                         const qrData = result.getText()
                         handleScanResult(qrData)
                     }
-                },
+                }
             )
         } catch (error) {
             console.error("Ошибка запуска сканера:", error)
@@ -283,6 +310,7 @@
             toast.add({ severity: "error", summary: "Ошибка", detail: "Не удалось запустить сканер", life: 3000 })
         }
     }
+
 
     function stopScanner() {
         if (codeReader) {

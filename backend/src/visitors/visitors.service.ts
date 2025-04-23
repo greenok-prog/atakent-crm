@@ -98,7 +98,7 @@ export class VisitorsService {
   }
   
   async findAll(query: any) {
-    const { exhibition, fair, registrationDateStart, registrationDateEnd } = query;
+    const { exhibition, fair, registrationDateStart, registrationDateEnd, type } = query;
 
     
     try {
@@ -107,6 +107,7 @@ export class VisitorsService {
           where: {
             exhibitionId: exhibition,
             fair: fair,
+            executor: type,
             date: registrationDateStart && registrationDateEnd 
               ? Between(registrationDateStart, registrationDateEnd)
               : undefined

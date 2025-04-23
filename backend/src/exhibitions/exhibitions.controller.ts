@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipeBuilder, HttpStatus, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors, UploadedFile, ParseFilePipeBuilder, HttpStatus, Query, UseGuards } from '@nestjs/common';
 import { ExhibitionsService } from './exhibitions.service';
 import { CreateExhibitionDto } from './dto/create-exhibition.dto';
 import { UpdateExhibitionDto } from './dto/update-exhibition.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('Exhibitions')
 @Controller('exhibitions')
@@ -12,6 +13,7 @@ export class ExhibitionsController {
   constructor(private readonly exhibitionsService: ExhibitionsService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', {
     storage:diskStorage({
       destination:'app/public/exhibitions',
@@ -33,11 +35,13 @@ export class ExhibitionsController {
   }
 
   @Get(':id')
+  
   findOne(@Param('id') id: string) {
     return this.exhibitionsService.findOne(+id);
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', {
     storage: diskStorage({
       destination: 'public/exhibitions',
@@ -59,6 +63,7 @@ export class ExhibitionsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.exhibitionsService.remove(+id);
   }

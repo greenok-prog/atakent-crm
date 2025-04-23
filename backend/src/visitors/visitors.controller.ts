@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, Header, StreamableFile } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Query, Header, StreamableFile, UseGuards } from '@nestjs/common';
 import { VisitorsService } from './visitors.service';
 import { Response } from 'express';
 import { CreateVisitorDto } from './dto/create-visitor.dto';
 import { UpdateVisitorDto } from './dto/update-visitor.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { join } from 'path';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('Visitors')
 @Controller('visitors')
@@ -15,8 +16,9 @@ export class VisitorsController {
   create(@Body() createVisitorDto: CreateVisitorDto) {
     return this.visitorsService.create(createVisitorDto);
   }
-
+  
   @Get()
+  @UseGuards(JwtAuthGuard)
   findAll(@Query() query) {
     return this.visitorsService.findAll(query);
   }
@@ -31,6 +33,7 @@ export class VisitorsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   update(@Param('id') id: string, @Body() updateVisitorDto: UpdateVisitorDto) {
     return this.visitorsService.update(+id, updateVisitorDto);
   }
@@ -47,6 +50,7 @@ export class VisitorsController {
     res.end(buffer);
   }
   @Get('export')
+  @UseGuards(JwtAuthGuard)
   @Header('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   @Header('Content-Disposition', 'attachment; filename="visitors.xlsx"')
   async exportVisitors(@Query() query): Promise<StreamableFile> {
@@ -55,6 +59,7 @@ export class VisitorsController {
   
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.visitorsService.remove(+id);
   }
@@ -75,8 +80,9 @@ export class VisitorsController {
   }
 
   @Post('scan-uuid')
+  @UseGuards(JwtAuthGuard)
   async scanUuid(@Body() body: { uuid: string }) {
-    console.log('-------------------------------------', body);
+
     
     try {
       const success = await this.visitorsService.changeQrValue(body.uuid);
@@ -98,6 +104,7 @@ export class VisitorsController {
   }
 
   @Get("change")
+  @UseGuards(JwtAuthGuard)
   async changeQr(@Query('uuid') uuid: string, @Res() res: Response) {
     
     try {

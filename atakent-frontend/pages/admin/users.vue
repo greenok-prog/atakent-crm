@@ -85,11 +85,9 @@
                   <label class="text-sm font-medium text-gray-700">
                     Тип посетителя
                   </label>
-                  <Select v-model="filters.type"
+                  <Select v-model="filters.type" :options="typeOptions" optionLabel="name" optionValue="value"
                     class="w-full p-2.5 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900">
-                    <option value="">Все типы</option>
-                    <option value="individual">Частное лицо</option>
-                    <option value="company">Юридическое лицо</option>
+
                   </Select>
                 </div>
               </div>
@@ -134,6 +132,7 @@
               </template>
             </Column>
             <Column field="fair" header="Источник"></Column>
+            <Column field="companyName" header="Компания"></Column>
             <Column field="qrStatus" header="Статус QR">
               <template #body="slotProps">
                 <span :class="[
@@ -197,6 +196,7 @@
   const config = useRuntimeConfig()
   const { getVisitors, removeVisitor } = useVisitorsStore()
   const { visitors } = storeToRefs(useVisitorsStore())
+  const typeOptions = [{ name: 'Частное лицо', value: 'individual' }, { name: 'Специалист', value: 'company' }, { name: 'Все типы', value: '' }]
   const filters = ref({
     exhibition: '',
     source: '',
@@ -282,7 +282,8 @@
       exhibition?: string,
       fair?: string,
       registrationDateStart?: string,
-      registrationDateEnd?: string
+      registrationDateEnd?: string,
+      type?: string
     }
     const queryObject: QueryType = {}
     if (filters.value.exhibition) {
@@ -290,6 +291,9 @@
     }
     if (filters.value.source) {
       queryObject['fair'] = filters.value.source
+    }
+    if (filters.value.type) {
+      queryObject['type'] = filters.value.type
     }
     if (filters.value.dates && filters.value.dates.length === 2) {
       const [start, end] = filters.value.dates;

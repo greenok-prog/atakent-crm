@@ -174,7 +174,7 @@
                 await navigator.share({
                     title: 'Билет на выставку',
                     text: `Билет на выставку "${registration.exhibition.name}"`,
-                    url: registration.qrValue
+                    url: `${config.public.clientUrl}/visitor`
                 })
             } catch (error) {
                 console.error('Error sharing:', error)

@@ -54,7 +54,8 @@ export default defineNuxtConfig({
   runtimeConfig:{
     public:{
       baseUrl: process.env.BASE_URL,
-      countryKey:process.env.COUNTRY_API_KEY
+      countryKey:process.env.COUNTRY_API_KEY,
+      clientUrl: process.env.CLIENT_URL
     }
   },
   postcss: {

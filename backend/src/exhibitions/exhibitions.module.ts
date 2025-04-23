@@ -4,9 +4,13 @@ import { ExhibitionsController } from './exhibitions.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Exhibition } from './entities/exhibition.entity';
 import { Organizer } from 'src/organizers/entities/organizer.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Exhibition, Organizer]),],
+  imports: [TypeOrmModule.forFeature([Exhibition, Organizer]),JwtModule.register({
+    secret: process.env.SECRET_ACCESS,
+    signOptions: { expiresIn: '1h' },
+  }),],
   controllers: [ExhibitionsController],
   providers: [ExhibitionsService],
 })
