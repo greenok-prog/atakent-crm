@@ -48,7 +48,8 @@ import { MailerModule } from './mailer/mailer.module';
   
   ExhibitionsModule, ExhibitorsModule,
   ServeStaticModule.forRoot({
-    rootPath: join(__dirname, '..'),
+    rootPath: join(__dirname, '..', 'public'),  // Путь до public папки
+    serveRoot: '/public',  // Путь, по которому будут доступны статичные файлы
   }),
   EmployeesModule,
   VisitorsModule,
