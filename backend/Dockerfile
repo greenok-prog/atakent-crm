@@ -1,5 +1,5 @@
 FROM node:20
-# Установка системных библиотек, нужных для Chromium (Puppeteer)
+# Установка зависимостей для Chromium
 RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
@@ -18,7 +18,14 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    libgbm1 \
+    libxshmfence1 \
+    libglu1-mesa \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libxss1 \
     --no-install-recommends \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
