@@ -278,6 +278,10 @@
             console.error("Ошибка инициализации сканера:", error)
             toast.add({ severity: "error", summary: "Ошибка", detail: "Не удалось инициализировать сканер", life: 3000 })
         }
+        if (!selectedDeviceId.value) {
+            selectedDeviceId.value = videoDevices.value[0]?.deviceId
+            console.warn("⚠️ Фронтальная камера не найдена, используем первую доступную")
+        }
     }
 
 
@@ -287,12 +291,20 @@
     }
 
     async function startScanner() {
-        if (!codeReader || !videoElement.value || !hasCamera.value || !selectedDeviceId.value) return
+        console.log("▶️ startScanner() вызван")
+        console.log("hasCamera:", hasCamera.value)
+        console.log("selectedDeviceId:", selectedDeviceId.value)
+        console.log("videoElement:", videoElement.value)
+
+        if (!codeReader || !videoElement.value || !hasCamera.value || !selectedDeviceId.value) {
+            console.warn("⛔ Сканер не может быть запущен. Проверь параметры выше.")
+            return
+        }
 
         try {
             isScanning.value = true
             scanResult.value = null
-            debugInfo.value = null
+            console.log("🚀 Стартуем сканирование с:", selectedDeviceId.value)
 
             await codeReader.decodeFromVideoDevice(
                 selectedDeviceId.value,
@@ -300,16 +312,20 @@
                 (result, error) => {
                     if (result) {
                         const qrData = result.getText()
+                        console.log("✅ QR найден:", qrData)
                         handleScanResult(qrData)
+                    } else if (error) {
+                        console.error("❌ Ошибка сканирования:", error)
                     }
                 }
             )
         } catch (error) {
-            console.error("Ошибка запуска сканера:", error)
+            console.error("❌ Ошибка запуска сканера:", error)
             isScanning.value = false
             toast.add({ severity: "error", summary: "Ошибка", detail: "Не удалось запустить сканер", life: 3000 })
         }
     }
+
 
 
     function stopScanner() {
