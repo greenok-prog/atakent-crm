@@ -58,89 +58,7 @@ export  const getHtmlMessage = (visitor:Visitor, qrImg:string) =>{
         text-align: center;
         margin-bottom: 30px;
       }
-      .page {
-        width: 210mm;
-        min-height: 297mm;
-        padding: 20mm;
-        margin: auto;
-        background: white;
-        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        box-sizing: border-box;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-      }
-  
-      @media print {
-        body, .page {
-          box-shadow: none;
-          margin: 0;
-          padding: 0;
-        }
-      }
-      h1 {
-        text-align: center;
-      }
-      .img{
-          position: absolute;
-      }
-  
-      p {
-       margin: 0;
-      }
-      .top{
-          width: 100%;
-          height: 39px;
-          background: rgba(18, 75, 150, 1);
-      }
-      .bottom{
-          width: 100%;
-          height: 39px;
-          background: rgba(18, 75, 150, 1);
-  
-      }
-      .three{
-          left: 370px;
-      }
-      .logo{
-          position: absolute;
-          left: 430px;
-          top: 180px;
-          display: flex;
-          gap: 4px;
-      }
-      .logo p{
-          font-size: 16px;
-          width: 148px;
-      }
-      .logo img{
-          width: 100%;
-      }
-      .info{
-          position: absolute;
-          top: 390px;
-          left: 120px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-      }
-      .qr-block{
-          position: absolute;
-          top: 570px;
-          left: 240px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-      }
-      .qr-border{
-          border: 2px solid black;
-          border-radius: 40px;
-          width: 280px;
-          height: 305px;
-         
-          
-      }
+
       .qr img {
         width: 180px;
         height: 180px;
@@ -156,34 +74,27 @@ export  const getHtmlMessage = (visitor:Visitor, qrImg:string) =>{
     </style>
   </head>
   <body>
-  <div class="page">
-  <div class="figures">
-      <img class="img" src="./img/Vector 1.png" alt="">
-      <img class="img three" src="./img/Vector 3.png" alt="">
-      <img class="img atakent" src="./img/atakent 1.png" alt="">
-      <img class="img" src="./img/Vector 2.png" alt="">
-      <div class="top"></div>
-     
-  </div>
-  <div class="logo">
-      <img src="./img/atakent.png" alt="">
-      <p>Международная 
-          Выставочная
-          Компания</p>
-  </div>
-  <div class="info">
-      <p>ФИО</p>
-      <p>Дата регистрации:</p>
-      <p>ID билета:</p>
-  </div>
-  <div class="qr-block">
-      <h2>ВАШ БИЛЕТ НА ВЫСТАВКУ</h2>
-      <div class="qr-border">
-
+    <div class="ticket">
+      <div class="header">
+        <h1>Ваш билет на выставку</h1>
+        <div class="event">${visitor.exhibition.name}</div>
       </div>
-  </div>
-  <div class="bottom"></div>
-</div>
+
+      <div class="details">
+        <p><strong>Имя:</strong> ${visitor.name}</p>
+        <p><strong>Статус:</strong> ${visitor.executor === 'company' ? 'Компания' : 'Физическое лицо'}</p>
+        <p><strong>Дата регистрации:</strong> ${visitor.date.toLocaleDateString('ru-RU')}</p>
+        <p><strong>ID билета:</strong> ${visitor.id}</p>
+      </div>
+
+      <div class="qr">
+        <img src="${qrImg}" alt="QR Code" />
+      </div>
+
+      <div class="footer">
+        Покажите этот билет на входе. Не забудьте документ, удостоверяющий личность.
+      </div>
+    </div>
   </body>
 </html>
 `;
