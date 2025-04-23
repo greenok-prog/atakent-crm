@@ -35,11 +35,21 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-4">
+                    <div class="flex gap-4 items-end">
                         <Button v-if="isScanning" @click="stopScanner" icon="pi pi-times" label="Остановить"
-                            class="p-button-danger" />
-                        <Button v-if="!isScanning && hasCamera" @click="startScanner" icon="pi pi-refresh"
-                            label="Возобновить" />
+                            class="p-button-danger w-48" />
+                        <Button class="w-48 h-12" v-if="!isScanning && hasCamera" @click="startScanner"
+                            icon="pi pi-refresh" label="Возобновить" />
+                        <!-- Выбор камеры -->
+                        <div class="mt-4 w-full max-w-md">
+                            <label class="block text-sm text-gray-700 mb-1">Выбор камеры:</label>
+                            <select v-model="selectedDeviceId" @change="switchCamera"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option v-for="device in videoDevices" :key="device.deviceId" :value="device.deviceId">
+                                    {{ device.label || 'Камера ' + device.deviceId }}
+                                </option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -180,22 +190,38 @@
     const selectedDeviceId = ref<string | null>(null)
     const videoDevices = ref<MediaDeviceInfo[]>([])
 
-    function selectFrontCamera() {
-        const frontCam = videoDevices.value.find((device) =>
-            /front|user/i.test(device.label)
-        )
-        if (frontCam) {
-            selectedDeviceId.value = frontCam.deviceId
-            startScanner()
-        } else {
+    async function switchCamera() {
+        console.log("🔄 Переключение на устройство:", selectedDeviceId.value)
+        if (!videoElement.value) return
+
+        // Останавливаем текущий сканер
+        stopScanner()
+
+        try {
+            await codeReader?.decodeFromVideoDevice(
+                selectedDeviceId.value,
+                videoElement.value,
+                (result, error) => {
+                    if (result) {
+                        const qrData = result.getText()
+                        console.log("✅ QR найден:", qrData)
+                        handleScanResult(qrData)
+                    }
+                }
+            )
+
+            isScanning.value = true
+        } catch (error) {
+            console.error("❌ Ошибка переключения камеры:", error)
             toast.add({
-                severity: "warn",
-                summary: "Камера",
-                detail: "Фронтальная камера не найдена",
+                severity: "error",
+                summary: "Ошибка",
+                detail: "Не удалось переключить камеру",
                 life: 3000,
             })
         }
     }
+
     // QR-сканер
     let codeReader: BrowserMultiFormatReader | null = null
 
@@ -314,8 +340,6 @@
                         const qrData = result.getText()
                         console.log("✅ QR найден:", qrData)
                         handleScanResult(qrData)
-                    } else if (error) {
-                        console.error("❌ Ошибка сканирования:", error)
                     }
                 }
             )
