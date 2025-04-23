@@ -131,16 +131,12 @@
     await getSources()
     await getExhibitions()
 
-
-    // const { data: countries } = await useFetch(`https://data-api.oxilor.com/rest/countries?key=${config.public.countryKey}&lng=ru`)
-
-
     const validationSchema = yup.object({
         name: yup.string().required('Обязательное поле'),
         email: yup.string().required('Обязательное поле').email('Неверный формат Email'),
         phone: yup.string().required('Обязательное поле'),
         fair: yup.string().required('Обязательное поле'),
-        exhibition: yup.number().required('Обязательное поле'),
+        exhibition: yup.string().required('Обязательное поле'),
         executor: yup.string().required('Обязательное поле').is(['individual', 'company'], 'Обязательное поле'),
         country: yup.string(),
         companyName: yup.string()

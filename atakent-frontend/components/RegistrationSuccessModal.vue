@@ -41,7 +41,9 @@
                                         <div class="font-medium text-gray-900">{{ registration.exhibition.name }}</div>
 
                                         <div class="text-gray-600">Дата:</div>
-                                        <div class="font-medium text-gray-900">{{ registration.date }}</div>
+                                        <div class="font-medium text-gray-900">{{ new
+                                            Intl.DateTimeFormat('ru-RU').format(new Date(registration.date)) }}
+                                        </div>
 
                                         <div class="text-gray-600">Посетитель:</div>
                                         <div class="font-medium text-gray-900">{{ registration.name }}</div>
@@ -75,7 +77,6 @@
                                                 <li>Билет также отправлен на ваш email</li>
                                                 <li>Для входа на выставку предъявите QR-код на экране телефона или в
                                                     распечатанном виде</li>
-                                                <li>При себе необходимо иметь документ, удостоверяющий личность</li>
                                             </ul>
                                         </div>
                                     </div>

@@ -39,7 +39,9 @@ export class VisitorsService{
     }
 
     async remove(id:number){
-        const res = await useAPI(`${API_ROUTES.VISITORS}/${id}`)
+        const res = await useAPI(`${API_ROUTES.VISITORS}/${id}`, {
+            method:'DELETE'
+        })
         if(res.error.value && this.toast){
             this.toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Ошибка при удалении', life: 3000 }); // Уведомление об ошибке
         }else{
@@ -48,5 +50,6 @@ export class VisitorsService{
 
             }
         }
+        return res
     }
 }

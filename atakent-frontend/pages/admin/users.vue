@@ -151,7 +151,7 @@
                 <button @click="viewDetails(slotProps.data)" class="text-blue-600 hover:text-blue-900 mr-3">
                   Просмотр
                 </button>
-                <button class="text-red-600 hover:text-red-900">
+                <button class="text-red-600 hover:text-red-900" @click="deleteVisitor(slotProps.data.id)">
                   Удалить
                 </button>
               </template>
@@ -195,7 +195,7 @@
     qrStatus: boolean;
   }
   const config = useRuntimeConfig()
-  const { getVisitors } = useVisitorsStore()
+  const { getVisitors, removeVisitor } = useVisitorsStore()
   const { visitors } = storeToRefs(useVisitorsStore())
   const filters = ref({
     exhibition: '',
@@ -242,7 +242,9 @@
   const sourcesChartLabels = computed(() => {
     return visitors.value?.exhibitionStatistics.map(el => el.name)
   })
-
+  const deleteVisitor = async (id: number) => {
+    await removeVisitor(id)
+  }
   const { getSources } = useSourcesStore()
   const { sources } = storeToRefs(useSourcesStore())
 

@@ -293,7 +293,15 @@ export class VisitorsService {
     return `This action updates a #${id} visitor`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} visitor`;
+  async remove(id: number): Promise<{ message: string }> {
+    const visitor = await this.VisitorRepository.findOneBy({ id });
+  
+    if (!visitor) {
+      throw new HttpException('Посетитель не найден', HttpStatus.NOT_FOUND);
+    }
+  
+    await this.VisitorRepository.remove(visitor);
+  
+    return { message: 'Посетитель успешно удалён' };
   }
 }

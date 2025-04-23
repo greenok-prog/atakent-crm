@@ -42,6 +42,8 @@ import { MailerModule } from './mailer/mailer.module';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [Exhibitor, Exhibition, Employee, Visitor, User, Source, Organizer],
+    synchronize: true,        // 👈 Это создаёт таблицы автоматически
+    autoLoadEntities: true,
     
   }), 
   

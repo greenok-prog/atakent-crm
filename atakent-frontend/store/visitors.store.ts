@@ -28,6 +28,13 @@ export const useVisitorsStore = defineStore('visitors', () => {
         }
         return response
     }
+    const removeVisitor = async (id: number) => {
+        const res = await visitorService.remove(id)
+        if (res.data && visitors.value) {
+            visitors.value.visitors = visitors.value.visitors.filter(v => v.id !== id)
+        }
+        return res
+    }
     const getVisitorsCount = computed(() => {
         return visitors.value?.visitors.length
     })
@@ -38,6 +45,7 @@ export const useVisitorsStore = defineStore('visitors', () => {
         visitors,
         getVisitors,
         addVisitor,
+        removeVisitor,
         getVisitorsCount
         
     }
