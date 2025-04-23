@@ -21,6 +21,10 @@ async function bootstrap() {
     .setDescription('The notes API description')
     .setVersion('1.0')
     .build();
+    app.enableCors({
+      origin: ['https://expoticket.kz', 'https://www.expoticket.kz'], // можно '*', но лучше явно
+      credentials: true,
+    });
   app.useGlobalPipes(new ValidationPipe({
     exceptionFactory: (errors) => {
       const result = errors.map((error) => ({
