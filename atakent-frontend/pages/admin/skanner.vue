@@ -427,6 +427,7 @@
                 valid: data.value.valid,
                 scanned: data.value.scanned,
             }
+            await markAsScanned()
 
             scanHistory.value.unshift({
                 timestamp: Date.now(),
@@ -443,11 +444,11 @@
                     : "QR-код действителен",
                 life: 2500,
             })
-
+            stopScanner()
             // ⏱ Автоматический перезапуск через 3 секунды
             setTimeout(() => {
                 startScanner()
-            }, 3000)
+            }, 5000)
 
         } catch (error) {
             scanResult.value = {
