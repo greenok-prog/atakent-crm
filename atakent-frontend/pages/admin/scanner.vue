@@ -190,6 +190,11 @@
     const selectedDeviceId = ref<string | null>(null)
     const videoDevices = ref<MediaDeviceInfo[]>([])
 
+    interface SkanDto {
+        visitor: Visitor,
+        scanned: boolean
+        valid: boolean
+    }
     async function switchCamera() {
         console.log("🔄 Переключение на устройство:", selectedDeviceId.value)
         if (!videoElement.value) return
@@ -412,7 +417,7 @@
         currentToken.value = uuid
 
         try {
-            const { data, error } = await useAPI("/visitors/verify-uuid", {
+            const { data, error } = await useAPI<SkanDto>("/visitors/verify-uuid", {
                 params: { uuid },
             })
 
@@ -481,7 +486,7 @@
         scanResult.value.loading = true
 
         try {
-            const { data, error } = await useAPI("/visitors/scan-uuid", {
+            const { data, error } = await useAPI<SkanDto>("/visitors/scan-uuid", {
                 method: "POST",
                 body: { uuid: currentToken.value },
             })
@@ -501,13 +506,6 @@
                 valid: true,
                 scanned: true,
             }
-
-            scanHistory.value.unshift({
-                timestamp: Date.now(),
-                visitor: data.value.visitor,
-                success: data.value.success,
-                message: data.value.message,
-            })
 
             toast.add({
                 severity: "success",

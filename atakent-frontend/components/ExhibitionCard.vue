@@ -137,8 +137,6 @@
         if (exhibitionImage) {
             formData.append('image', exhibitionImage)
         }
-
-        formData.append('website', 'fsdfsdfsdf')
         formData.append('organizer', String(formValues.organizer_id))
 
         const res = await changeExhibition(props.exhibition.id, formData)

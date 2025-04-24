@@ -41,7 +41,7 @@ export class ExhibitionsService {
 }
 
   async findOne(id: number) {
-    return await this.ExhibitionRepository.findBy({id})
+    return await this.ExhibitionRepository.findOneBy({id})
   }
 
   async update(id: number, updateExhibitionDto: UpdateExhibitionDto) {

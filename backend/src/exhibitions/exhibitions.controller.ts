@@ -6,6 +6,9 @@ import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import path from 'path';
+import * as fs from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 @ApiTags('Exhibitions')
 @Controller('exhibitions')
@@ -16,7 +19,7 @@ export class ExhibitionsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('image', {
     storage:diskStorage({
-      destination:'app/public/exhibitions',
+      destination:'public/exhibitions',
       filename: (req, file, cb) => {
         cb(null, `${file.originalname}`);
       },
@@ -41,26 +44,39 @@ export class ExhibitionsController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image', {
-    storage: diskStorage({
-      destination: 'public/exhibitions',
-      filename: (req, file, cb) => {
-        cb(null, `${file.originalname}`);
-      },
-    }),
-  }))
-  async update(
-    @Param('id') id: string,
-    @Body() updateExhibitionDto: UpdateExhibitionDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    if (file) {
-      return this.exhibitionsService.update(+id, { ...updateExhibitionDto, image: file.path });
-    } else {
-      return this.exhibitionsService.update(+id, updateExhibitionDto);
+@UseGuards(JwtAuthGuard)
+@UseInterceptors(FileInterceptor('image', {
+  storage: diskStorage({
+    destination: 'public/exhibitions',
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const uniqueName = `${uuidv4()}${ext}`;
+      cb(null, uniqueName);
+    },
+  }),
+}))
+async update(
+  @Param('id') id: string,
+  @Body() updateExhibitionDto: UpdateExhibitionDto,
+  @UploadedFile() file: Express.Multer.File,
+) {
+  const existing = await this.exhibitionsService.findOne(+id);
+
+  // Если есть новый файл и у выставки уже был старый файл — удалить старый
+  if (file && existing.image) {
+    const oldImagePath = path.join(process.cwd(), existing.image);
+    if (fs.existsSync(oldImagePath)) {
+      fs.unlinkSync(oldImagePath);
     }
   }
+
+  // Обновить запись, указав путь к новому изображению (если загружено)
+  const updatedData = file
+    ? { ...updateExhibitionDto, image: file.path.replace(/\\/g, '/') }
+    : updateExhibitionDto;
+
+  return this.exhibitionsService.update(+id, updatedData);
+}
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)

@@ -48,7 +48,6 @@
     if (exhibitionImage) {
       formData.append('image', exhibitionImage);
     }
-    formData.append('website', 'fsdfsdfsdf')
     formData.append('organizer', String(formValues.organizer_id))
     // Отправка данных на сервер
     const res = await addExhibition(formData)

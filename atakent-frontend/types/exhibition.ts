@@ -22,4 +22,5 @@ export interface ExhibitionCreate{
     image?: File,
     location:string
     organizer_id:number
+    website?:string
 }

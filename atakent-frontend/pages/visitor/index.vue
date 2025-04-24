@@ -12,7 +12,7 @@
             </div>
 
             <!-- Registration Form -->
-            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-4 md:p-4">
                 <form class="space-y-6" @submit="submitHandler">
                     <!-- Visitor Type -->
                     <div class="space-y-4">
@@ -43,25 +43,26 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <BaseInput v-model="name" v-bind="nameAttrs" :errorMessage="errors.name" label="Имя"
-                                class="w-full" />
+                                placehoder="Введите имя" class="w-full" />
                         </div>
 
                         <div class="space-y-2">
                             <BaseInputMask v-model="phone" v-bind="phoneAttrs" :errorMessage="errors.phone"
-                                label="Номер телефона" class="w-full" />
+                                placehoder="Введите номер" label="Номер телефона" class="w-full" />
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <BaseInput v-model="email" v-bind="emailAttrs" :errorMessage="errors.email" type="email"
-                            label="Email" class="w-full" />
+                            placehoder="Введите email" label="Email" class="w-full" />
                     </div>
 
                     <!-- Exhibition Selection -->
                     <div class="space-y-2">
                         <label class="font-medium text-gray-700 text-sm" for="">Выберите выставку</label>
                         <Select class="w-full py-1" placeholder="Выберите выставку" v-model="exhibition"
-                            v-bind="exhibitionAttrs" :options="exhibitions" optionLabel="name" optionValue="id" />
+                            v-bind="exhibitionAttrs" :disabled="isExhibitionDisabled" :options="exhibitions"
+                            optionLabel="name" optionValue="id" />
                         <small v-if="errors.exhibition" class="text-red-500">{{ errors.exhibition }}</small>
                     </div>
 
@@ -115,6 +116,7 @@
     import { useVisitorsStore } from '~/store/visitors.store';
     import { useSourcesStore } from '~/store/sources.store';
     import { LucideBuilding, LucideUser } from '#components';
+    import type { Exhibition } from '~/types/exhibition';
 
     const route = useRoute()
     const config = useRuntimeConfig()
@@ -167,6 +169,7 @@
     const [companyName, companyNameAttrs] = defineField('companyName')
 
     const isFairDisabled = ref(false)
+    const isExhibitionDisabled = ref(false)
 
     const isDataLoading = ref(false)
     const responseData = ref<null | Visitor>(null)
@@ -204,6 +207,14 @@
                 isFairDisabled.value = true
             }
         }
+        if (route.query.exhibition && exhibitions.value) {
+            const selectedExhibition: Exhibition | undefined = exhibitions.value.find(el => el.id === Number(route.query.exhibition))
+            if (selectedExhibition) {
+                exhibition.value = selectedExhibition.id
+                isExhibitionDisabled.value = true
+            }
+        }
+
     })
 
 </script>

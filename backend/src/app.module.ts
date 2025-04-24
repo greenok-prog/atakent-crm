@@ -45,6 +45,7 @@ import { MailerModule } from './mailer/mailer.module';
     synchronize: true,        // 👈 Это создаёт таблицы автоматически
     autoLoadEntities: true,
     
+    
   }), 
   
   ExhibitionsModule, ExhibitorsModule,

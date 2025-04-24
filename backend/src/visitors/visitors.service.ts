@@ -98,49 +98,69 @@ export class VisitorsService {
   }
   
   async findAll(query: any) {
-    const { exhibition, fair, registrationDateStart, registrationDateEnd, type } = query;
-
-    
+    const {
+      exhibition,
+      fair,
+      registrationDateStart,
+      registrationDateEnd,
+      type,
+      page = 1,
+      limit = 10,
+    } = query;
+  
+    const skip = (page - 1) * limit;
+  
+    const where: any = {
+      exhibitionId: exhibition,
+      fair,
+      executor: type,
+    };
+  
+    if (registrationDateStart && registrationDateEnd) {
+      where.date = Between(registrationDateStart, registrationDateEnd);
+    }
+  
     try {
-      const [visitorsList, exhibitionStatistics, fairStatistics] = await Promise.all([
-        this.VisitorRepository.find({
-          where: {
-            exhibitionId: exhibition,
-            fair: fair,
-            executor: type,
-            date: registrationDateStart && registrationDateEnd 
-              ? Between(registrationDateStart, registrationDateEnd)
-              : undefined
-          },
-          relations: ['exhibition'],
-          order: { date: 'DESC' }
-        }),
+      const [visitorsList, totalCount] = await this.VisitorRepository.findAndCount({
+        where,
+        relations: ['exhibition'],
+        order: { date: 'DESC' },
+        take: +limit,
+        skip: +skip,
+      });
+  
+      const [exhibitionStatistics, fairStatistics] = await Promise.all([
         this.VisitorRepository.createQueryBuilder('visitor')
           .select('exhibition.name', 'name')
           .addSelect('COUNT(visitor.id)', 'count')
           .innerJoin('visitor.exhibition', 'exhibition')
           .groupBy('exhibition.id')
           .getRawMany(),
+  
         this.VisitorRepository.createQueryBuilder('visitor')
           .select('visitor.fair', 'name')
           .addSelect('COUNT(DISTINCT visitor.id)', 'count')
           .groupBy('visitor.fair')
-          .getRawMany()
+          .getRawMany(),
       ]);
-
+  
       return {
         visitors: visitorsList,
+        total: totalCount,
+        page: +page,
+        limit: +limit,
+        pages: Math.ceil(totalCount / limit),
         fairStatistics,
         exhibitionStatistics,
-        individualCount: visitorsList.filter(visitor => visitor.executor === 'individual').length,
-        companyCount: visitorsList.filter(visitor => visitor.executor === 'company').length,
-        qrStats: visitorsList.filter(visitor => visitor.qr).length
+        individualCount: visitorsList.filter(v => v.executor === 'individual').length,
+        companyCount: visitorsList.filter(v => v.executor === 'company').length,
+        qrStats: visitorsList.filter(v => v.qr).length,
       };
     } catch (error) {
-      
       throw error;
     }
   }
+  
   async exportToExcel(query: any): Promise<StreamableFile> {
     const { exhibition, fair, registrationDateStart, registrationDateEnd } = query;
     console.log(query);

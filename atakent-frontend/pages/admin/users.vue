@@ -227,8 +227,9 @@
       console.error('Ошибка при экспорте:', err);
     }
   };
-  const first = ref(0);
+  const first = ref(1);
   const rowsPerPage = ref(10);
+
   const exhibitionChartCounts = computed(() => {
     return visitors.value?.exhibitionStatistics.map(el => el.count)
   })
@@ -283,9 +284,14 @@
       fair?: string,
       registrationDateStart?: string,
       registrationDateEnd?: string,
-      type?: string
+      type?: string,
+      page?: number,
+      limit?: number
     }
+
     const queryObject: QueryType = {}
+    queryObject['page'] = first.value
+    queryObject['limit'] = rowsPerPage.value
     if (filters.value.exhibition) {
       queryObject['exhibition'] = filters.value.exhibition
     }
@@ -326,7 +332,7 @@
   watch(queries, fetchData, { immediate: true })
 
   function onPage(event: any) {
-    first.value = event.first;
+    first.value = event.first + 1;
     rowsPerPage.value = event.rows;
   }
   const chartOptions = {

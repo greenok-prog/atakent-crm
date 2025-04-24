@@ -49,16 +49,23 @@
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-semibold mb-4">Создание ссылки</h2>
                     <div class="grid grid-cols-5 gap-4">
-                        <Select class="col-span-2" />
-                        <Select class="col-span-2" />
-                        <Button label="Создать" />
+                        <Select placeholder="Источник" v-model="selectedSource" :options="sources" optionLabel="name"
+                            optionValue="name" class="col-span-2" />
+                        <Select placeholder="Выставка" v-model="selectdExhibition" :options="exhibitions"
+                            optionLabel="name" optionValue="id" class="col-span-2" />
+                        <Button label="Создать" @click="createLink" />
                     </div>
+
                     <div class="grid grid-cols-5 mt-4 gap-4">
-                        <div class="col-span-4 border h-10 rounded">
-                            <p></p>
+                        <div class="col-span-4 border h-10 rounded overflow-hidden p-2">
+                            <p class="whitespace-nowrap overflow-hidden text-ellipsis px-2">
+                                {{ createdLink }}
+                            </p>
                         </div>
-                        <Button icon="pi pi-copy" raised severity="secondary" aria-label="Save" />
+                        <Button icon="pi pi-copy" raised severity="secondary" aria-label="Save"
+                            @click="copyToClipboard" />
                     </div>
+                    <span v-if="copied" class="text-green-500 text-sm ml-2">Скопировано!</span>
                 </div>
             </div>
         </div>
@@ -86,6 +93,7 @@
     import { useSourcesStore } from '~/store/sources.store';
     import { useOrganizersStore } from '~/store/organizers.store';
     import type { Organizer } from '~/types/organizer';
+    import { useExhibitionsStore } from '~/store/exhibitions.store';
     definePageMeta({
         layout: 'admin-layout'
     })
@@ -94,11 +102,39 @@
 
     const { sources } = storeToRefs(useSourcesStore())
     const { organizers } = storeToRefs(useOrganizersStore())
+
+    const { exhibitions } = storeToRefs(useExhibitionsStore())
+    const { getExhibitions } = useExhibitionsStore()
+
     const { getSources, addSource, removeSource, changeSource } = useSourcesStore()
     const { getOrganizers, addOrganizer, removeOrganizer, changeOrganizer } = useOrganizersStore()
-
+    const selectedSource = ref(null)
+    const selectdExhibition = ref(null)
     const organizer = ref('')
     const source = ref('')
+    const createdLink = ref('')
+    const config = useRuntimeConfig()
+    const copied = ref(false)
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(createdLink.value)
+            copied.value = true
+            setTimeout(() => copied.value = false, 1500) // сообщение исчезает через 1.5 сек
+        } catch (err) {
+            console.error('Не удалось скопировать:', err)
+        }
+    }
+    const createLink = () => {
+        const params = new URLSearchParams()
+        if (selectdExhibition.value) {
+            params.append('exhibition', selectdExhibition.value)
+        }
+        if (selectedSource.value) {
+            params.append('fair', selectedSource.value)
+        }
+        const link = `${config.public.clientUrl}/visitor?${params}`
+        createdLink.value = link
+    }
 
     const editType = ref<'organizer' | 'source'>('organizer');
     const editItem = ref<null | Organizer>(null)
@@ -148,6 +184,7 @@
 
     await getOrganizers()
     await getSources()
+    await getExhibitions()
 
 
 </script>

@@ -10,6 +10,7 @@
                 v-bind="organizerAttrs" placeholder="Организатор" />
             <DatePicker v-model="dateStart" v-bind="startDateAttrs" placeholder="Дата начала выставки" />
             <DatePicker v-model="dateEnd" v-bind="endDateAttrs" placeholder="Дата окончания выставки" />
+            <BaseInput v-model="website" v-bind="websiteAttrs" class="w-full" placeholder="Сайт" />
             <FileInput :file="exhibitionImage" :preloadServer="initialExhibitionValues?.image"
                 @onChangeFile="(event) => onAddImage(event)" />
         </div>
@@ -46,7 +47,8 @@
                 dateEnd: new Date(exhibition?.dateEnd) ?? '',
                 dateStart: new Date(exhibition.dateStart) ?? '',
                 location: exhibition.location ?? '',
-                organizer_id: exhibition.organizer_id ?? ''
+                organizer_id: exhibition.organizer_id ?? '',
+                website: exhibition.website ?? ''
             }
         }
         else {
@@ -56,7 +58,8 @@
                 dateEnd: new Date(),
                 dateStart: new Date(),
                 location: '',
-                organizer_id: 0
+                organizer_id: 0,
+                website: ''
             }
         }
     })
@@ -78,7 +81,8 @@
         dateStart: date().required(),
         dateEnd: date().required(),
         location: string().required(),
-        organizer_id: number().required()
+        organizer_id: number().required(),
+        website: string()
     })
 
     // Exhibition form
@@ -94,7 +98,7 @@
     const [dateStart, startDateAttrs] = defineField('dateStart')
     const [location, locationAttrs] = defineField('location')
     const [organizer_id, organizerAttrs] = defineField('organizer_id')
-
+    const [website, websiteAttrs] = defineField('website')
 
     const submitHandler = handleSubmit(() => emit('formSubmitHandler', formValues, exhibitionImage.value))
 </script>
