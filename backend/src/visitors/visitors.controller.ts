@@ -80,7 +80,6 @@ export class VisitorsController {
   }
 
   @Post('scan-uuid')
-  @UseGuards(JwtAuthGuard)
   async scanUuid(@Body() body: { uuid: string }) {
 
     
@@ -104,7 +103,6 @@ export class VisitorsController {
   }
 
   @Get("change")
-  @UseGuards(JwtAuthGuard)
   async changeQr(@Query('uuid') uuid: string, @Res() res: Response) {
     
     try {

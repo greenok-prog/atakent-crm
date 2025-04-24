@@ -330,6 +330,7 @@
         try {
             isScanning.value = true
             scanResult.value = null
+            currentToken.value = null
             console.log("🚀 Стартуем сканирование с:", selectedDeviceId.value)
 
             await codeReader.decodeFromVideoDevice(
@@ -389,7 +390,6 @@
 
             // Проверяем UUID
             await verifyVisitor(uuid)
-            await markAsScanned()
         } catch (error) {
 
             scanResult.value = {
