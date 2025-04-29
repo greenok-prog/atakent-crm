@@ -274,7 +274,7 @@ export class VisitorsService {
     return visitor
   }
  
-  async generatePdfTicket(visitorId) {
+  async generatePdfTicket(visitorId:number) {
     try {
       const visitorData = await this.VisitorRepository.findOne({
         where: { id: visitorId },
@@ -466,7 +466,7 @@ export class VisitorsService {
       throw error;
     }
   }
-  async generateDefaultPdfTicket(visitor: Visitor): Promise<Buffer> {
+  async generateDefaultPdfTicket(visitor: Visitor): Promise<any> {
     // Путь к QR-коду
     const qrPath = path.resolve(
       process.cwd(),
