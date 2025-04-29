@@ -38,14 +38,23 @@ export class ExhibitionsController {
   }
 
   @Get(':id')
-  
   findOne(@Param('id') id: string) {
     return this.exhibitionsService.findOne(+id);
   }
+  
+  @Get(':id/archive')
+  async changeArchiveValue( @Param('id') id: number){
+    const exhibition = await this.exhibitionsService.findOne(id)
+    if(exhibition.archive){
+      return await this.exhibitionsService.removeFromArchive(id)
+    }else{
+      return await this.exhibitionsService.addToArchive(id)
+    }
+  }
 
   @Patch(':id')
-@UseGuards(JwtAuthGuard)
-@UseInterceptors(FileInterceptor('image', {
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image', {
   storage: diskStorage({
     destination: 'public/exhibitions',
     filename: (req, file, cb) => {

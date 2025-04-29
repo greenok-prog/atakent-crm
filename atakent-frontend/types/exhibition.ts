@@ -10,7 +10,9 @@ export interface Exhibition{
     id:number
     organizer:Organizer,
     organizer_id:number,
-    website?:string
+    website?:string,
+    ticketUrl?:string,
+    archive:boolean
 }
 
 
@@ -22,5 +24,6 @@ export interface ExhibitionCreate{
     image?: File,
     location:string
     organizer_id:number
-    website?:string
+    website?:string,
+    ticketUrl?:string,
 }

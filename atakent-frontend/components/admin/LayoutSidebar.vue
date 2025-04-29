@@ -29,7 +29,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-    import { IconsHome, LucideAirplay, LucideBolt, LucideCalendar, LucideHome, LucideUser, LucideUserPlus } from '#components'
+    import { IconsHome, LucideAirplay, LucideAlbum, LucideBolt, LucideCalendar, LucideHome, LucideUser, LucideUserPlus } from '#components'
     import { useUserStore } from '~/store/user.store'
 
     const sidebarExpanded = ref(true)
@@ -71,11 +71,18 @@
             access: 'ADMIN'
         },
         {
+            label: 'Билеты',
+            icon: LucideAlbum,
+            to: '/admin/image',
+            access: 'ADMIN'
+        },
+        {
             label: 'Сканер',
             icon: LucideAirplay,
             to: '/admin/scanner',
             access: 'ADMIN'
         },
+
 
     ]
 

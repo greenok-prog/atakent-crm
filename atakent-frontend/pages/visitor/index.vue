@@ -61,7 +61,7 @@
                     <div class="space-y-2">
                         <label class="font-medium text-gray-700 text-sm" for="">Выберите выставку</label>
                         <Select class="w-full py-1" placeholder="Выберите выставку" v-model="exhibition"
-                            v-bind="exhibitionAttrs" :disabled="isExhibitionDisabled" :options="exhibitions"
+                            v-bind="exhibitionAttrs" :disabled="isExhibitionDisabled" :options="activeExhibitions"
                             optionLabel="name" optionValue="id" />
                         <small v-if="errors.exhibition" class="text-red-500">{{ errors.exhibition }}</small>
                     </div>
@@ -129,6 +129,10 @@
     const { addVisitor } = useVisitorsStore()
     const { getSources } = useSourcesStore()
     const { sources } = storeToRefs(useSourcesStore())
+
+    const activeExhibitions = computed(() => {
+        return exhibitions.value.filter(ex => !ex.archive)
+    })
 
     await getSources()
     await getExhibitions()

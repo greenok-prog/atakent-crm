@@ -24,6 +24,7 @@ import { OrganizersModule } from './organizers/organizers.module';
 import { Organizer } from './organizers/entities/organizer.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MailerModule } from './mailer/mailer.module';
+import { TicketsModule } from './tickets/tickets.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ExhibitorsModule, ExhibitionsModule, EmployeesModule, VisitorsModule, UsersModule, AuthModule, OrganizersModule, SourcesModule, JwtModule, MailerModule]),
@@ -61,7 +62,8 @@ import { MailerModule } from './mailer/mailer.module';
   JwtModule,
   SourcesModule,
   OrganizersModule,
-  MailerModule],
+  MailerModule,
+  TicketsModule],
   controllers: [AppController],
   providers: [AppService, JwtAuthGuard, JwtService],
   

@@ -5,18 +5,48 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Exhibition } from './entities/exhibition.entity';
 import { Repository } from 'typeorm';
 import { Organizer } from 'src/organizers/entities/organizer.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Injectable()
 export class ExhibitionsService {
   constructor(
     @InjectRepository(Exhibition)
     private ExhibitionRepository: Repository<Exhibition>,
+    @InjectRepository(Ticket)
+    private TicketRepository: Repository<Ticket>,
   ){}
 
   async create(dto: CreateExhibitionDto) {
-    let newExhibition = this.ExhibitionRepository.create(dto)
+    const ticketUrl = await this.TicketRepository.findOneBy({id: Number(dto.ticketUrl)})
+    let newExhibition = this.ExhibitionRepository.create({...dto, ticketUrl})
     return await this.ExhibitionRepository.save(newExhibition)
    
+  }
+
+  async addToArchive(id: number) {
+    const exhibition = await this.ExhibitionRepository.findOne({
+      where: { id },
+    })
+
+    if (exhibition) {
+      exhibition.archive = true
+      return await this.ExhibitionRepository.save(exhibition)
+    }
+
+    return null
+  }
+
+  async removeFromArchive(id: number) {
+    const exhibition = await this.ExhibitionRepository.findOne({
+      where: { id },
+    })
+
+    if (exhibition) {
+      exhibition.archive = false
+      return await this.ExhibitionRepository.save(exhibition)
+    }
+
+    return null
   }
 
   async findAll(query) {
@@ -45,8 +75,9 @@ export class ExhibitionsService {
   }
 
   async update(id: number, updateExhibitionDto: UpdateExhibitionDto) {
+    const ticketUrl = await this.TicketRepository.findOneBy({id: Number(updateExhibitionDto.ticketUrl)})
     // Обновляем данные
-    await this.ExhibitionRepository.update(id, updateExhibitionDto);
+    await this.ExhibitionRepository.update(id, {...updateExhibitionDto, ticketUrl});
   
     // Находим и возвращаем обновленный объект
     return this.ExhibitionRepository.findOneBy({id}, );

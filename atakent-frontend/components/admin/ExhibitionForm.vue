@@ -11,6 +11,9 @@
             <DatePicker v-model="dateStart" v-bind="startDateAttrs" placeholder="Дата начала выставки" />
             <DatePicker v-model="dateEnd" v-bind="endDateAttrs" placeholder="Дата окончания выставки" />
             <BaseInput v-model="website" v-bind="websiteAttrs" class="w-full" placeholder="Сайт" />
+            <Select v-model="ticketUrl" :options="tickets" optionLabel="name" optionValue="id" v-bind="ticketUrlAttrs"
+                placeholder="Билет" />
+
             <FileInput :file="exhibitionImage" :preloadServer="initialExhibitionValues?.image"
                 @onChangeFile="(event) => onAddImage(event)" />
         </div>
@@ -38,6 +41,8 @@
     const { organizers } = storeToRefs(useOrganizersStore())
     const { getOrganizers } = useOrganizersStore()
 
+    const { data: tickets } = await useAPI('/tickets')
+
     await getOrganizers()
     const initialValues = computed(() => {
         if (exhibition) {
@@ -48,7 +53,8 @@
                 dateStart: new Date(exhibition.dateStart) ?? '',
                 location: exhibition.location ?? '',
                 organizer_id: exhibition.organizer_id ?? '',
-                website: exhibition.website ?? ''
+                website: exhibition.website ?? '',
+                ticketUrl: exhibition.ticketUrl ?? ''
             }
         }
         else {
@@ -59,7 +65,8 @@
                 dateStart: new Date(),
                 location: '',
                 organizer_id: 0,
-                website: ''
+                website: '',
+                ticketUrl: ''
             }
         }
     })
@@ -82,7 +89,8 @@
         dateEnd: date().required(),
         location: string().required(),
         organizer_id: number().required(),
-        website: string()
+        website: string(),
+        ticketUrl: string()
     })
 
     // Exhibition form
@@ -99,6 +107,7 @@
     const [location, locationAttrs] = defineField('location')
     const [organizer_id, organizerAttrs] = defineField('organizer_id')
     const [website, websiteAttrs] = defineField('website')
+    const [ticketUrl, ticketUrlAttrs] = defineField('ticketUrl')
 
     const submitHandler = handleSubmit(() => emit('formSubmitHandler', formValues, exhibitionImage.value))
 </script>

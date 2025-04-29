@@ -24,13 +24,6 @@ export class VisitorsController {
   }
 
 
-  @Get(':id/ticket')
-  async downloadFile(@Param('id') id: string, @Res() response: Response) {
-    const file = await this.visitorsService.downloadTicket(+id);
-    const fileName = `ticket-${id}.png`;
-  
-    return response.download(file, fileName);
-  }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)

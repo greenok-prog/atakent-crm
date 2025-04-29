@@ -3,7 +3,7 @@
         <NuxtLink to="/admin/managers/add">
             <Button label="Добавить менеджера" />
         </NuxtLink>
-        <DataTable :value="data" class="bg-transparent" scrollable>
+        <DataTable :value="data" class="bg-transparent mt-2" scrollable>
             <Column style="min-width: 300px" field="name" header="Имя"></Column>
             <Column style="min-width: 300px" field="email" header="Email"></Column>
             <Column style="min-width: 300px" field="roles" header="Роли"></Column>

@@ -51,7 +51,16 @@ export const useExhibitionsStore = defineStore('exhibitions', () => {
         }
         return res
     }
-
+    const changeArchive = async (id:number) => {
+        const res = await exhibitionsService.changeArchive(id)
+        if(!res.error.value){
+            let index = exhibitions.value.findIndex(obj => obj.id === id);
+            if (index !== -1) {
+                exhibitions.value[index].archive = !exhibitions.value[index].archive;
+            }
+        }
+        return res
+    }
     const changeExhibition = async (id: number, exhibition: Exhibition) => {
         const res = await exhibitionsService.change(id, exhibition)
         if (!res.error.value && res.data.value) {
@@ -71,6 +80,7 @@ export const useExhibitionsStore = defineStore('exhibitions', () => {
         removeExhibition,
         addExhibition,
         changeExhibition,
-        getMainExhibitions
+        getMainExhibitions,
+        changeArchive
     }
 })

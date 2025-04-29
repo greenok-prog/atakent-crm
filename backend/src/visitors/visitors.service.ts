@@ -16,6 +16,9 @@ import { getHtmlMessage } from './utils/pdf';
 import { MailerService } from '../mailer/mailer.service';
 import { PassThrough } from 'stream';
 import * as ExcelJS from 'exceljs';
+import * as sharp from 'sharp';
+import { TicketsService } from 'src/tickets/tickets.service';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 @Injectable()
 export class VisitorsService {
@@ -25,8 +28,11 @@ export class VisitorsService {
     private VisitorRepository: Repository<Visitor>,
     @InjectRepository(Exhibition)
     private ExhibitionRepository: Repository<Exhibition>,
+    @InjectRepository(Ticket)
+    private TicketRepository: Repository<Ticket>,
     private configService: ConfigService,
-    private mailerService: MailerService
+    private mailerService: MailerService,
+    private ticketService: TicketsService
     
 
   ){}
@@ -44,6 +50,7 @@ export class VisitorsService {
 
     return {staticPath:staticPath, path:qrImagePath,};
   }
+  
   async create(createVisitorDto: CreateVisitorDto) {
     const { email, phone, exhibition } = createVisitorDto;
   
@@ -85,11 +92,11 @@ export class VisitorsService {
   
     try {
       const pdfBuffer = await this.generatePdfTicket(savedVisitor.id);
-      await this.mailerService.sendTicket(
-        savedVisitor.email,
-        Buffer.from(pdfBuffer),
-        `ticket-${savedVisitor.name}.pdf`,
-      );
+      // await this.mailerService.sendTicket(
+      //   savedVisitor.email,
+      //   Buffer.from(pdfBuffer),
+      //   `ticket-${savedVisitor.name}.pdf`,
+      // );
     } catch (err) {
       this.logger.error('Не удалось отправить билет на email:', err.message);
     }
@@ -177,8 +184,6 @@ export class VisitorsService {
       relations: ['exhibition'],
       order: { date: 'DESC' },
     });
-
-    console.log(visitors);
   
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Посетители');
@@ -268,43 +273,222 @@ export class VisitorsService {
     
     return visitor
   }
-  async downloadTicket(id: number) {
-    const visitor = await this.VisitorRepository.findOneBy({ id });
+ 
+  async generatePdfTicket(visitorId) {
+    try {
+      const visitorData = await this.VisitorRepository.findOne({
+        where: { id: visitorId },
+        relations: ['exhibition'],
+      });
   
-    if (!visitor || !visitor.qrValue) {
-      throw new Error('QR code not found');
+      if (!visitorData) throw new Error('Visitor not found');
+      
+      this.logger.log(`Генерация билета для посетителя: ${visitorData.name}, ID: ${visitorData.id}`);
+  
+      // Путь к QR-коду
+      const qrPath = path.resolve(
+        process.cwd(),
+        visitorData.qrValue.replace(/^\/public/, 'public'),
+      );
+      
+      const exhibition = await this.ExhibitionRepository.findOne({
+        where: { id: visitorData.exhibitionId },
+        relations: ['ticketUrl']
+      });
+      
+      // Проверяем наличие шаблона билета в выставке
+      if (visitorData.exhibition && exhibition.ticketUrl) {
+        // Получаем информацию о шаблоне билета
+        const ticketId = exhibition.ticketUrl.id;
+        const ticket = await this.TicketRepository.findOne({
+          where: { id: ticketId },
+        });
+        
+        this.logger.log(`Данные шаблона билета: ${JSON.stringify(ticket)}`);
+  
+        if (!ticket) {
+          this.logger.warn(`Шаблон билета с ID ${ticketId} не найден`);
+          return this.generateDefaultPdfTicket(visitorData);
+        }
+  
+        try {
+          // Проверяем существование файлов
+          await fs.access(qrPath);
+          
+          // Нормализуем путь к изображению шаблона
+          const imagePath = ticket.image.replace(/\\/g, '/');
+          const templateImagePath = path.resolve(process.cwd(), imagePath);
+          
+          this.logger.log(`Путь к шаблону: ${templateImagePath}`);
+          this.logger.log(`Путь к QR-коду: ${qrPath}`);
+          
+          await fs.access(templateImagePath);
+  
+          // Получаем информацию об изображении шаблона
+          const templateMetadata = await sharp(templateImagePath).metadata();
+          this.logger.log(`Размеры шаблона: ${templateMetadata.width}x${templateMetadata.height}`);
+          
+          // Читаем QR-код и изображение шаблона
+          const qrBuffer = await fs.readFile(qrPath);
+          const templateBuffer = await fs.readFile(templateImagePath);
+  
+          // ИСПРАВЛЕНИЕ: Всегда используем процентные значения, если они доступны
+          let x, y, width, height;
+          
+          if (ticket.xPercent !== undefined && ticket.xPercent !== null && 
+              ticket.yPercent !== undefined && ticket.yPercent !== null && 
+              ticket.wPercent !== undefined && ticket.wPercent !== null && 
+              ticket.hPercent !== undefined && ticket.hPercent !== null) {
+            
+            // Используем процентные значения
+            this.logger.log(`Используем процентные значения: xPercent=${ticket.xPercent}, yPercent=${ticket.yPercent}, wPercent=${ticket.wPercent}, hPercent=${ticket.hPercent}`);
+            
+            // Преобразуем проценты в пиксели на основе реальных размеров изображения
+            x = Math.round((ticket.xPercent / 100) * templateMetadata.width);
+            y = Math.round((ticket.yPercent / 100) * templateMetadata.height);
+            width = Math.round((ticket.wPercent / 100) * templateMetadata.width);
+            height = Math.round((ticket.hPercent / 100) * templateMetadata.height);
+            
+            this.logger.log(`Рассчитанные координаты из процентов: x=${x}, y=${y}, width=${width}, height=${height}`);
+          } else {
+            // Используем абсолютные значения только если процентные недоступны
+            this.logger.log(`Процентные значения не найдены, используем абсолютные значения: x=${ticket.x}, y=${ticket.y}, w=${ticket.w}, h=${ticket.h}`);
+            
+            // Преобразуем строковые значения в числа
+            x = parseInt(String(ticket.x), 10);
+            y = parseInt(String(ticket.y), 10);
+            width = parseInt(String(ticket.w), 10);
+            height = parseInt(String(ticket.h), 10);
+          }
+          
+          this.logger.log(`Итоговые координаты QR-кода: x=${x}, y=${y}, width=${width}, height=${height}`);
+  
+          // Изменяем размер QR-кода в соответствии с шаблоном
+          const resizedQrBuffer = await sharp(qrBuffer)
+            .resize({
+              width: width,
+              height: height,
+              fit: 'fill'
+            })
+            .toBuffer();
+          
+          this.logger.log(`QR-код изменен до размеров: ${width}x${height}`);
+  
+          // Накладываем QR-код на шаблон
+          const result = await sharp(templateBuffer)
+            .composite([
+              {
+                input: resizedQrBuffer,
+                top: y,
+                left: x,
+              },
+            ])
+            .toBuffer();
+          
+          this.logger.log('QR-код наложен на шаблон');
+  
+          // Конвертируем в base64 для вставки в HTML
+          const base64Image = result.toString('base64');
+          const imageWithQr = `data:image/jpeg;base64,${base64Image}`;
+  
+          // Создаем HTML для PDF с сохранением пропорций изображения
+          const html = `
+            <html>
+              <head>
+                <style>
+                  body { 
+                    margin: 0; 
+                    padding: 0; 
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                  }
+                  .ticket-container { 
+                    max-width: 100%;
+                    max-height: 100vh;
+                    display: flex;
+                    justify-content: center;
+                  }
+                  .ticket-image { 
+                    max-width: 100%;
+                    max-height: 100vh;
+                    object-fit: contain;
+                  }
+                </style>
+              </head>
+              <body>
+                <div class="ticket-container">
+                  <img src="${imageWithQr}" class="ticket-image" />
+                </div>
+              </body>
+            </html>
+          `;
+  
+          // Генерируем PDF с учетом размеров изображения
+          const browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+          });
+  
+          const page = await browser.newPage();
+          await page.setContent(html, { waitUntil: 'networkidle0' });
+          
+          // Устанавливаем размер PDF в соответствии с размером изображения
+          const pdfBuffer = await page.pdf({ 
+            format: 'A4',
+            printBackground: true,
+            margin: {
+              top: '0',
+              right: '0',
+              bottom: '0',
+              left: '0'
+            }
+          });
+  
+          await browser.close();
+          
+          this.logger.log('PDF успешно сгенерирован');
+          return pdfBuffer;
+        } catch (error) {
+          this.logger.error(
+            `Ошибка при генерации PDF с шаблоном: ${error.message}`,
+            error.stack
+          );
+          return this.generateDefaultPdfTicket(visitorData);
+        }
+      } else {
+        this.logger.log('Шаблон билета не найден, используем стандартный шаблон');
+        return this.generateDefaultPdfTicket(visitorData);
+      }
+    } catch (error) {
+      this.logger.error(`Общая ошибка при генерации PDF билета: ${error.message}`);
+      throw error;
     }
-  
-    // Убери /public — у тебя скорее всего папка 'public/qr' лежит в root проекта
-    const qrRelativePath = visitor.qrValue.replace(/^\/public/, 'public');
-  
-    const filePath = path.resolve(process.cwd(), qrRelativePath);
-  
-    return filePath;
   }
-  async generatePdfTicket(visitorId: number) {
-    const visitor = await this.VisitorRepository.findOne({
-      where: { id: visitorId },
-      relations: ['exhibition'],
-    });
-  
-    if (!visitor) throw new Error('Visitor not found');
-  
-    // Правильный путь до QR
-    const qrPath = path.resolve(process.cwd(), visitor.qrValue.replace(/^\/public/, 'public'));
-    
+  async generateDefaultPdfTicket(visitor: Visitor): Promise<Buffer> {
+    // Путь к QR-коду
+    const qrPath = path.resolve(
+      process.cwd(),
+      visitor.qrValue.replace(/^\/public/, 'public'),
+    );
+
     // Читаем и кодируем QR как base64
     const qrBuffer = await fs.readFile(qrPath);
     const base64QR = qrBuffer.toString('base64');
     const qrImg = `data:image/png;base64,${base64QR}`;
-  
-    const html = getHtmlMessage(visitor, qrImg)
-  
-    const browser = await puppeteer.launch({ headless: true,  args: ['--no-sandbox', '--disable-setuid-sandbox'], });
+
+    const html = getHtmlMessage(visitor, qrImg);
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+
     const page = await browser.newPage();
     await page.setContent(html, { waitUntil: 'networkidle0' });
     const pdfBuffer = await page.pdf({ format: 'A4' });
-  
+
     await browser.close();
     return pdfBuffer;
   }

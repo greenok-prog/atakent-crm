@@ -30,6 +30,7 @@
     "qrcode": "^1.5.4",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
+    "vue3-draggable-resizable": "^1.6.5",
     "yup": "^1.4.0"
   },
   "devDependencies": {

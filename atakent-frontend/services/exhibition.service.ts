@@ -75,5 +75,11 @@ export class ExhibitionsService{
         }
         return res 
     }
+    async changeArchive(id:number){
+        const res = await useAPI<Exhibition>(`${API_ROUTES.EXHIBITIONS}/${id}/archive`, {
+            method:'GET',
+        })
+        return res 
+    }
     
 }

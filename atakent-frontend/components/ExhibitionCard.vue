@@ -16,6 +16,12 @@
                         <PencilIcon class="h-4 w-4 mr-2" />
                         Редактировать
                     </button>
+                    <button v-if="!isEditing" @click="changeArchiveHandler"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                        <LucideEye v-if="exhibition.archive" class="h-4 w-4 mr-2" />
+                        <LucideEyeOff v-else class="h-4 w-4 mr-2" />
+                        {{ exhibition.archive ? 'Убрать из архива' : 'Добавить в архив' }}
+                    </button>
                     <button @click="confirmDelete"
                         class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
                         <TrashIcon class="h-4 w-4 mr-2" />
@@ -113,7 +119,11 @@
     const isDetailsOpen = ref(false)
 
 
-    const { changeExhibition, removeExhibition } = useExhibitionsStore()
+    const { changeExhibition, removeExhibition, changeArchive } = useExhibitionsStore()
+
+    const changeArchiveHandler = async () => {
+        return await changeArchive(props.exhibition.id)
+    }
 
     const showDetails = () => {
         isDetailsOpen.value = true

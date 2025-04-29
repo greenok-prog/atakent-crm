@@ -4,6 +4,7 @@ import { IsNotEmpty } from 'class-validator';
 import { Exhibitor } from 'src/exhibitors/entities/exhibitor.entity';
 import { Visitor } from 'src/visitors/entities/visitor.entity';
 import { Organizer } from 'src/organizers/entities/organizer.entity';
+import { Ticket } from 'src/tickets/entities/ticket.entity';
 
 
 @Entity()
@@ -37,6 +38,10 @@ export class Exhibition {
     @ApiProperty({ description: 'Exhibition start date', nullable: false })
     dateStart: Date;
 
+    @Column({default:false})
+    @ApiProperty({description: 'is exhibition in archive', nullable:true})
+    archive:Boolean
+
     @IsNotEmpty({ message: 'Дата окончания должна быть заполнена' })
     @Column()
     @ApiProperty({ description: 'Exhibition end date', nullable: false })
@@ -47,10 +52,9 @@ export class Exhibition {
     @ApiProperty({ description: 'Exhibition image', nullable: true })
     image: string;
 
-    @IsNotEmpty({ message: 'Ссылка на билет должна быть заполнена' })
-    @Column({nullable: true })
+    @ManyToOne(() => Ticket, (ticket) => ticket.exhibition, { onDelete: 'SET NULL', onUpdate: 'SET NULL' })
     @ApiProperty({ description: 'Exhibition ticket bg', nullable: true })
-    ticketUrl: string;
+    ticketUrl: Ticket;
 
     @OneToMany(() => Exhibitor, (exhibitor) => exhibitor.exhibiton)
     exhibitors: Exhibitor[];
