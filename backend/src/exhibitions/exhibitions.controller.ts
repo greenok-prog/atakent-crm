@@ -6,7 +6,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import path from 'path';
+import path, { extname } from 'path';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -21,7 +21,11 @@ export class ExhibitionsController {
     storage:diskStorage({
       destination:'public/exhibitions',
       filename: (req, file, cb) => {
-        cb(null, `${file.originalname}`);
+        const randomName = Array(32)
+        .fill(null)
+        .map(() => Math.round(Math.random() * 16).toString(16))
+        .join('');
+      return cb(null, `${randomName}${extname(file.originalname)}`);
       },
     })
   }))
@@ -41,7 +45,7 @@ export class ExhibitionsController {
   findOne(@Param('id') id: string) {
     return this.exhibitionsService.findOne(+id);
   }
-  
+
   @Get(':id/archive')
   async changeArchiveValue( @Param('id') id: number){
     const exhibition = await this.exhibitionsService.findOne(id)
