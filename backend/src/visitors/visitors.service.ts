@@ -316,7 +316,7 @@ export class VisitorsService {
           await fs.access(qrPath);
           
           // Нормализуем путь к изображению шаблона
-          const imagePath = ticket.image.replace(/\\/g, '/');
+          const imagePath = ticket.image.replace(/^\/public/, 'public');
           const templateImagePath = path.resolve(process.cwd(), imagePath);
           
           this.logger.log(`Путь к шаблону: ${templateImagePath}`);

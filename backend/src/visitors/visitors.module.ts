@@ -11,7 +11,7 @@ import { Ticket } from 'src/tickets/entities/ticket.entity';
 import { TicketsService } from 'src/tickets/tickets.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Visitor, Exhibition, Ticket]), MailerModule, JwtModule.register({
+  imports: [TypeOrmModule.forFeature([Visitor, Exhibition, Ticket]), MailerModule,  JwtModule.register({
     secret: process.env.SECRET_ACCESS,
     signOptions: { expiresIn: '1h' },
   }),],

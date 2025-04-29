@@ -40,6 +40,9 @@ export class Ticket {
   @Column('float', { nullable: true })
   h: number;
 
+  @Column({ nullable: true })
+  imageUrl: string;
+
   @OneToMany(() => Exhibition, (exhibition) => exhibition.ticketUrl)
   exhibition:Exhibition
   
