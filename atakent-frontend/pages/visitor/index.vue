@@ -124,6 +124,7 @@
     definePageMeta({
         layout: 'empty'
     })
+
     const { getExhibitions } = useExhibitionsStore()
     const { exhibitions } = storeToRefs(useExhibitionsStore())
     const { addVisitor } = useVisitorsStore()
@@ -133,6 +134,7 @@
     const activeExhibitions = computed(() => {
         return exhibitions.value.filter(ex => !ex.archive)
     })
+
 
     await getSources()
     await getExhibitions()
@@ -202,6 +204,30 @@
 
 
     });
+    // Dynamic title based on selected exhibition
+    const pageTitle = computed(() => {
+        if (exhibition.value && exhibitions.value) {
+            const selectedExhibition = exhibitions.value.find(ex => ex.id === exhibition.value)
+            if (selectedExhibition) {
+                return `Регистрация на выставку ${selectedExhibition.name} | Атакент-Экспо`
+            }
+        }
+        return 'Регистрация на выставку | Атакент-Экспо'
+    })
+
+    useHead({
+        title: pageTitle,
+        meta: [
+            { name: 'description', content: 'Заполните форму для получения электронного билета на выставку Атакент-Экспо' },
+            { name: 'keywords', content: 'выставка, регистрация, Атакент-Экспо, электронный билет, Казахстан' },
+            { property: 'og:title', content: pageTitle },
+            { property: 'og:description', content: 'Заполните форму для получения электронного билета на выставку Атакент-Экспо' },
+            { property: 'og:type', content: 'website' },
+            { name: 'twitter:card', content: 'summary_large_image' },
+            { name: 'twitter:title', content: pageTitle },
+            { name: 'twitter:description', content: 'Заполните форму для получения электронного билета на выставку Атакент-Экспо' }
+        ]
+    })
 
     onMounted(() => {
         if (route.query.fair && sources.value) {

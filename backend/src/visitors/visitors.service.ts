@@ -238,7 +238,7 @@ export class VisitorsService {
     const visitor = await this.VisitorRepository.findOneBy({uuid})
     return visitor
   }
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_WEEK)
   async removeOldQrCodes() {
     try {
       const qrDirectory = this.configService.get<string>('QR_PATH');

@@ -83,7 +83,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div v-for="(template, index) in savedTemplates" :key="index" class="border rounded overflow-hidden">
                     <div class="relative h-40 bg-gray-100">
-                        <img :src="template.imageUrl" class="w-full h-full object-contain" alt="Template" />
+                        <img :src="`${config.public.baseUrl}/${template.imageUrl}`" class="w-full h-full object-contain"
+                            alt="Template" />
                         <div class="absolute border-2 border-dashed border-blue-500" :style="{
                             left: `${template.qrPercentages.xPercent}%`,
                             top: `${template.qrPercentages.yPercent}%`,
@@ -116,6 +117,7 @@
     definePageMeta({
         layout: 'admin-layout'
     })
+    const config = useRuntimeConfig()
 
     const toast = useToast()
     const backgroundImage = ref(null)
