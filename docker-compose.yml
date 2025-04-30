@@ -19,8 +19,8 @@ services:
       - ./backend/.env
     depends_on:
       - postgres
-    # volumes:
-    #   - ./backend/public:/app/public
+    volumes:
+      - ./backend/public:/app/public
   frontend:
     build: ./atakent-frontend
     ports:
