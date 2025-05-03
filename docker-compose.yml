@@ -11,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - pg_data:/var/lib/postgresql/data    
+
   backend:
     build: ./backend
     ports:
@@ -21,6 +22,7 @@ services:
       - postgres
     volumes:
       - ./backend/public:/app/public
+
   frontend:
     build: ./atakent-frontend
     ports:
@@ -29,6 +31,17 @@ services:
       - ./atakent-frontend/.env
     depends_on:
       - backend
-  
+
+  migrations:
+    build: ./backend
+    command: npm run migration:run
+    depends_on:
+      - postgres
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
 volumes:
   pg_data:
