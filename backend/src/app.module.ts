@@ -33,9 +33,9 @@ import { TicketsModule } from './tickets/tickets.module';
     isGlobal: true,
     envFilePath: '.env', // делает конфигурацию доступной глобально// путь к вашему .env файлу
   }),
-  
+
   TypeOrmModule.forRoot({
-    
+
     type: 'postgres',
     host: process.env.DB_HOST,
     port: parseInt(process.env.DB_PORT),
@@ -43,29 +43,29 @@ import { TicketsModule } from './tickets/tickets.module';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     entities: [Exhibitor, Exhibition, Employee, Visitor, User, Source, Organizer],
-    synchronize: true,        // 👈 Это создаёт таблицы автоматически
+    synchronize: false,        // 👈 Это создаёт таблицы автоматически
     autoLoadEntities: true,
-    
-    
-  }), 
-  
-  ExhibitionsModule, ExhibitorsModule,
+
+
+  }),
+
+    ExhibitionsModule, ExhibitorsModule,
   ServeStaticModule.forRoot({
     rootPath: join(__dirname, '..', 'public'),  // Путь до public папки
     serveRoot: '/public',  // Путь, по которому будут доступны статичные файлы
   }),
-  
-  EmployeesModule,
-  VisitorsModule,
-  UsersModule,
-  AuthModule,
-  JwtModule,
-  SourcesModule,
-  OrganizersModule,
-  MailerModule,
-  TicketsModule],
+
+    EmployeesModule,
+    VisitorsModule,
+    UsersModule,
+    AuthModule,
+    JwtModule,
+    SourcesModule,
+    OrganizersModule,
+    MailerModule,
+    TicketsModule],
   controllers: [AppController],
   providers: [AppService, JwtAuthGuard, JwtService],
-  
+
 })
-export class AppModule {}
+export class AppModule { }
