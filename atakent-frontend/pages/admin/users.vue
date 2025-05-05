@@ -180,7 +180,8 @@
   import { useExhibitionsStore } from '~/store/exhibitions.store';
 
   definePageMeta({
-    layout: 'admin-layout'
+    layout: 'admin-layout',
+    middleware: 'auth',
   })
 
   interface Visitor {

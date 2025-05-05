@@ -115,7 +115,8 @@
     import { ref, onMounted, computed } from 'vue'
     import { useToast } from 'primevue/usetoast'
     definePageMeta({
-        layout: 'admin-layout'
+        layout: 'admin-layout',
+        middleware: 'auth',
     })
     const config = useRuntimeConfig()
 

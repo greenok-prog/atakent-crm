@@ -95,7 +95,8 @@
     import type { Organizer } from '~/types/organizer';
     import { useExhibitionsStore } from '~/store/exhibitions.store';
     definePageMeta({
-        layout: 'admin-layout'
+        layout: 'admin-layout',
+        middleware: 'auth',
     })
     const { defineField } = useForm()
     const [edit, editItemAttrs] = defineField('editItem')

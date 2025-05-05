@@ -11,7 +11,7 @@
 <script lang="ts" setup>
     definePageMeta({
         layout: 'admin-layout',
-        // middleware: ['auth', 'admin']
+        middleware: ['auth', 'admin']
     })
     const { defineField, values, handleSubmit } = useForm({
         initialValues: {

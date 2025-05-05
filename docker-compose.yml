@@ -43,7 +43,8 @@ services:
     build: ./backend
     command: npm run migration:run
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     env_file:
       - ./backend/.env
     volumes:
