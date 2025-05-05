@@ -7,6 +7,11 @@ services:
       POSTGRES_DB: testdb
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 10
     ports:
       - "5432:5432"
     volumes:
@@ -19,7 +24,9 @@ services:
     env_file:
       - ./backend/.env
     depends_on:
-      - postgres
+      postgres:
+         condition: service_healthy
+
     volumes:
       - ./backend/public:/app/public
 
