@@ -29,11 +29,18 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
+# Копируем только package.json для кэширования зависимостей
 COPY package*.json ./
+
+# Устанавливаем зависимости
 RUN npm install
 
+# Теперь копируем остальное
 COPY . .
 
+# Собираем приложение
 RUN npm run build
 
-CMD ["sh", "-c", "npm run migration:run && npm run seed:admin && npm run start:prod"]
+EXPOSE 8888
+
+CMD ["npm", "run", "start:prod"]
