@@ -145,6 +145,7 @@
     });
     const addSourceHandler = async () => {
         await addSource(source.value)
+        source.value = ''
     }
     const removeSourceHandler = async (id: number) => {
         await removeSource(id)

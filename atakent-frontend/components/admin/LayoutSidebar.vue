@@ -73,7 +73,7 @@
         {
             label: 'Билеты',
             icon: LucideAlbum,
-            to: '/admin/image',
+            to: '/admin/tickets',
             access: 'ADMIN'
         },
         {

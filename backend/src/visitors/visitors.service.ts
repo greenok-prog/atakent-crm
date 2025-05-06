@@ -92,11 +92,11 @@ export class VisitorsService {
   
     try {
       const pdfBuffer = await this.generatePdfTicket(savedVisitor.id);
-      // await this.mailerService.sendTicket(
-      //   savedVisitor.email,
-      //   Buffer.from(pdfBuffer),
-      //   `ticket-${savedVisitor.name}.pdf`,
-      // );
+      await this.mailerService.sendTicket(
+        savedVisitor.email,
+        Buffer.from(pdfBuffer),
+        `ticket-${savedVisitor.name}.pdf`,
+      );
     } catch (err) {
       this.logger.error('Не удалось отправить билет на email:', err.message);
     }

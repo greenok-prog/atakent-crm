@@ -16,13 +16,14 @@ async function createAdmin() {
   }
 
   const admin = userRepository.create({
+    name:'Admin',
     email: adminEmail,
     password: await bcrypt.hash(adminPass, 10),
     roles: ['ADMIN', 'MANAGER'], // или isAdmin: true — в зависимости от твоей схемы
   });
 
   await userRepository.save(admin);
-  console.log('✅ Superadmin created: admin@example.com / supersecurepassword');
+  console.log('✅ Superadmin created');
 
   await AppDataSource.destroy();
 }
