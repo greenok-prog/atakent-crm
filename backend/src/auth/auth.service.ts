@@ -53,6 +53,7 @@ export class AuthService {
   }
   async login(user: User) {
     const payload = { email: user.email, sub: user.id, roles: user.roles };
+   
     const result = await this.validateUser(user.email, user.password)
     
     if(result){

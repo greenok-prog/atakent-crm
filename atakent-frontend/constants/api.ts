@@ -3,5 +3,6 @@ export const API_ROUTES = {
     EXHIBITIONS: '/exhibitions',
     ORGANIZERS: '/organizers',
     VISITORS: '/visitors',
-    EXHIBITORS: '/exhibitors'
+    EXHIBITORS: '/exhibitors',
+    TICKETS:'/tickets'
 }

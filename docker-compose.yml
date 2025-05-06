@@ -19,6 +19,7 @@ services:
 
   backend:
     build: ./backend
+    command: sh -c "npm run migration:run && npm run seed:admin"
     ports:
       - "8888:8888"
     env_file:
@@ -28,7 +29,9 @@ services:
          condition: service_healthy
 
     volumes:
-      - ./backend/public:/app/public
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/public:/app/public  
 
   frontend:
     build: ./atakent-frontend
