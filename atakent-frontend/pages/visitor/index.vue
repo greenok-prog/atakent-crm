@@ -43,18 +43,18 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <BaseInput v-model="name" v-bind="nameAttrs" :errorMessage="errors.name" label="Имя"
-                                placehoder="Введите имя" class="w-full" />
+                                placeholder="Введите имя" class="w-full" />
                         </div>
 
                         <div class="space-y-2">
                             <BaseInputMask v-model="phone" v-bind="phoneAttrs" :errorMessage="errors.phone"
-                                placehoder="Введите номер" label="Номер телефона" class="w-full" />
+                                placeholder="Введите номер" label="Номер телефона" class="w-full" />
                         </div>
                     </div>
 
                     <div class="space-y-2">
                         <BaseInput v-model="email" v-bind="emailAttrs" :errorMessage="errors.email" type="email"
-                            placehoder="Введите email" label="Email" class="w-full" />
+                            placeholder="Введите email" label="Email" class="w-full" />
                     </div>
 
                     <!-- Exhibition Selection -->
@@ -62,7 +62,7 @@
                         <label class="font-medium text-gray-700 text-sm" for="">Выберите выставку</label>
                         <Select class="w-full py-1" placeholder="Выберите выставку" v-model="exhibition"
                             v-bind="exhibitionAttrs" :disabled="isExhibitionDisabled" :options="activeExhibitions"
-                            optionLabel="name" optionValue="id" />
+                            optionLabel="name" optionValue="id" emptyMessage="Нет доступных данных" />
                         <small v-if="errors.exhibition" class="text-red-500">{{ errors.exhibition }}</small>
                     </div>
 
@@ -70,7 +70,8 @@
                         <label class="font-medium text-gray-700 text-sm" for="">Источник</label>
                         <Select :options="sources" optionLabel="name" optionValue="name" v-model="fair"
                             v-bind="fairAttrs" :errorMessage="errors.fair" :disabled="isFairDisabled"
-                            label="Откуда вы узнали о выставке" class="w-full py-1" />
+                            label="Откуда вы узнали о выставке" class="w-full py-1"
+                            placeholder="Введите источник информации" emptyMessage="Нет доступных данных" />
                         <small v-if="errors.fair" class="text-red-500">{{ errors.fair }}</small>
                     </div>
 
